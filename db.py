@@ -27,7 +27,6 @@ def update_info(id: int, game_info: dict):
         UPDATE_QUERY = f"UPDATE {TABLE_NAME} SET {', '.join([f'{key}=?' for key in keys])} WHERE ID=?"
         cursor.execute(UPDATE_QUERY, values)
         conn.commit()
-    print(UPDATE_QUERY)
 
 def get_urls_without_info():
     with sqlite3.connect(DB_NAME) as conn:
