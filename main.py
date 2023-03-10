@@ -62,7 +62,7 @@ def main():
                 continue
             game_info = parse_game(response.text)
             db.update_info(url['ID'], game_info)
-    
+    print("FINISHED SCRAPING")
 if __name__ == '__main__':
     main()
 
