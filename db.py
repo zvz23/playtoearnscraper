@@ -19,6 +19,13 @@ def save_url(url: str):
         cursor = conn.cursor()
         cursor.execute(f"INSERT OR IGNORE INTO {TABLE_NAME}(URL) VALUES(?)", [url])
 
+def get_game_by_id(game_id: int):
+    with sqlite3.connect(DB_NAME) as conn:
+        cursor = conn.cursor()
+        cursor.row_factory = sqlite3.Row
+        cursor.execute(f"SELECT * FROM {TABLE_NAME} WHERE ID=?", [game_id])
+        return cursor.fetchone()
+
 def update_info(id: int, game_info: dict):
     with sqlite3.connect(DB_NAME) as conn:
         cursor = conn.cursor()
@@ -53,3 +60,10 @@ def get_urls_with_info_count():
         cursor = conn.cursor()
         cursor.execute(f"SELECT COUNT(ID) FROM {TABLE_NAME} WHERE NAME IS NOT NULL")
         return cursor.fetchone()[0]
+    
+def get_game_images():
+    with sqlite3.connect(DB_NAME) as conn:
+        cursor = conn.cursor()
+        cursor.row_factory = sqlite3.Row
+        cursor.execute(f"SELECT ID, PROFILE_PIC ,IMAGES FROM {TABLE_NAME} WHERE IMAGES IS NOT NULL")
+        return cursor.fetchall()
