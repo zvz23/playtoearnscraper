@@ -67,3 +67,31 @@ def get_game_images():
         cursor.row_factory = sqlite3.Row
         cursor.execute(f"SELECT ID, PROFILE_PIC ,IMAGES FROM {TABLE_NAME} WHERE IMAGES IS NOT NULL")
         return cursor.fetchall()
+
+
+def get_games_without_tokens():
+    with sqlite3.connect(DB_NAME) as conn:
+        cursor = conn.cursor()
+        cursor.row_factory = sqlite3.Row
+        cursor.execute(f"SELECT ID, URL FROM {TABLE_NAME} WHERE CRYPTO_TOKENS IS NULL AND NFT_TOKENS IS NULL")
+        return cursor.fetchall()
+    
+def get_crypto_tokens(id: int):
+    with sqlite3.connect(DB_NAME) as conn:
+        cursor = conn.cursor()
+        cursor.row_factory = sqlite3.Row
+        cursor.execute(f"SELECT CRYPTO_TOKENS FROM {TABLE_NAME} WHERE ID=?", [id])
+        return cursor.fetchone['CRYPTO_TOKENS']
+    
+def get_nft_tokens(id: int):
+    with sqlite3.connect(DB_NAME) as conn:
+        cursor = conn.cursor()
+        cursor.row_factory = sqlite3.Row
+        cursor.execute(f"SELECT NFT_TOKENS FROM {TABLE_NAME} WHERE ID=?", [id])
+        return cursor.fetchone['NFT_TOKENS']
+    
+def update_game_column(id: int, column: str, value: str):
+    with sqlite3.connect(DB_NAME) as conn:
+        cursor = conn.cursor()
+        cursor.execute(f"UPDATE {TABLE_NAME} SET {column}=? WHERE ID=?", [value, id])
+        conn.commit()

@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-
     <title>Play To Earn</title>
 </head>
-
 <body class="bg-dark">
     <div class="container">
         <div class="mt-5">
             <div class="mb-3 row text-white">
+                <input type="hidden" name="gameName" value="{{ game_info['NAME'] }}" />
                 <div class="col-4">
                     <a role="button"
                         href="{{ '#' if transformed_info['PREV_ID'] is none else transformed_info['PREV_ID'] }}"
@@ -30,12 +28,14 @@
                 </div>
             </div>
             <div class="mb-3">
+                <a class="btn btn-primary" href="{{ game_info['URL'] }}" target="_blank"> Open in Play-to-Earn</a>
+            </div>
+            <div class="mb-3">
                 <label class="form-label text-white">Title</label>
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" id="title" value="{{ transformed_info['TITLE'] }}">
                     <button class="btn bg-primary text-white" type="button" data-target="#title">Copy</button>
                 </div>
-
             </div>
             <div class="mb-3 row text-white">
                 <div class="col-6">
@@ -71,15 +71,59 @@
                             else '' }}>
                         <label class=" text-white">Free-to-Play</label>
                     </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" {{ 'checked' if transformed_info['NFT_SUPPORT']
+                            else '' }}>
+                        <label class=" text-white">NFT Support</label>
+                    </div>
+                    <div class="form-check mt-2">
+                        <a role="button" class="btn btn-warning" id="searchRentalButton" data-value="{{ game_info['NAME'] }}" href="#" target="_blank">Search NFT Rental</a>
+                    </div>
                 </div>
             </div>
             <div class="mb-3">
                 <label class="form-label text-white">Meta description</label>
                 <div class="input-group mb-3">
-                    <textarea class="form-control" rows="3"
+                    <textarea class="form-control" rows="8"
                         id="metaDescription">{{ transformed_info['META_DESCRIPTION'] }}</textarea>
                     <button class="btn bg-primary text-white" type="button" data-target="#metaDescription">Copy</button>
                 </div>
+            </div>
+            {% if transformed_info['IMAGES_PATH'] is not none %}
+                <div class="mb-3">
+                    <a role="button" data-value="{{ transformed_info['IMAGES_PATH'] }}" id="folderPath" class="btn btn-primary">Open images folder</a>
+                    </form>
+                </div>
+            {% endif %}
+            
+            <div class="mb-3">
+                <div class="d-flex justify-content-center">
+                    <div id="carouselExampleCaptions" class="carousel slide w-75" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for image in transformed_info['IMAGES']%}
+                                <div class="carousel-item {{ 'active' if loop.index == 1 else '' }}">
+                                    <img src="{{ image }}" class="d-block w-100" height="500" alt="...">
+                                    <!-- <div class="carousel-caption d-none d-md-block">
+                                        <h5>Second slide label</h5>
+                                        <p>Some representative placeholder content for the second slide.</p>
+                                    </div> -->
+                                </div>
+                            {% endfor %}
+    
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+                
             </div>
             <div class="mb-3 row">
                 <div class="col-6">
@@ -90,19 +134,11 @@
                     </div>
 
                 </div>
-                <div class="col-6">
-                    <label class="form-label text-white">Featured Image</label>
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" id="featuredImage">
-                        <button class="btn bg-primary text-white" type="button"
-                            data-target="#featuredImage">Copy</button>
-                    </div>
-                </div>
             </div>
             <div class="mb-3">
                 <label class="form-label text-white">Game Snapshot</label>
                 <div class="input-group mb-3">
-                    <textarea class="form-control" rows="3"
+                    <textarea class="form-control" rows="8"
                         id="gameSnapshot">{{ transformed_info['GAME_SNAPSHOT'] }}</textarea>
                     <button class="btn bg-primary text-white" type="button" data-target="#gameSnapshot">Copy</button>
                 </div>
@@ -145,7 +181,7 @@
             <h2 class="text-white">Community</h2>
             <div class="mb-3 row">
                 <div class="col-6">
-                    <label class="form-label text-white">Web</label>
+                    <label class="form-label text-white">Web <a {{ '' if game_info['WEBSITE'] is none else 'target="_blank"' }} href="{{ '#' if game_info['WEBSITE'] is none else game_info['WEBSITE'] }}">Open link</a></label>
                     <div class="input-group mb-3">
                         <input type="text" class="form-control" id="web" value="{{ game_info['WEBSITE'] }}">
                         <button class="btn bg-primary text-white" type="button" data-target="#web">Copy</button>
@@ -153,7 +189,7 @@
 
                 </div>
                 <div class="col-6">
-                    <label class="form-label text-white">Twitter</label>
+                    <label class="form-label text-white">Twitter <a {{ '' if game_info['TWITTER'] is none else 'target="_blank"' }} href="{{ '#' if game_info['TWITTER'] is none else game_info['TWITTER'] }}">Open link</a></label>
                     <div class="input-group mb-3">
                         <input type="text" class="form-control" id="twitter" value="{{ game_info['TWITTER'] }}">
                         <button class="btn bg-primary text-white" type="button" data-target="#twitter">Copy</button>
@@ -162,14 +198,14 @@
             </div>
             <div class="mb-3 row">
                 <div class="col-6">
-                    <label class="form-label text-white">Discord</label>
+                    <label class="form-label text-white">Discord <a {{ '' if game_info['DISCORD'] is none else 'target="_blank"' }} href="{{ '#' if game_info['DISCORD'] is none else game_info['DISCORD'] }}">Open link</a></label>
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control" id="discord" value="{{ game_info['DISCORD'] }}"" >
+                        <input type="text" class="form-control" id="discord" value="{{ game_info['DISCORD'] }}" >
                         <button class=" btn bg-primary text-white" type="button" data-target="#discord">Copy</button>
                     </div>
                 </div>
                 <div class="col-6">
-                    <label class="form-label text-white">Telegram</label>
+                    <label class="form-label text-white">Telegram <a {{ '' if game_info['TELEGRAM'] is none else 'target="_blank"' }} href="{{ '#' if game_info['TELEGRAM'] is none else game_info['TELEGRAM'] }}">Open link</a></label>
                     <div class="input-group mb-3">
                         <input type="text" class="form-control" id="telegram" value="{{ game_info['TELEGRAM'] }}">
                         <button class="btn bg-primary text-white" type="button" data-target="#telegram">Copy</button>
@@ -178,7 +214,9 @@
             </div>
             <div class="mb-3 row">
                 <div class="col-6">
-                    <label class="form-label text-white">Youtube</label>
+                    <label class="form-label text-white">Youtube <a {{ '' if game_info['YOUTUBE'] is none else 'target="_blank"' }} href="{{ '#' if game_info['YOUTUBE'] is none else game_info['YOUTUBE'] }}">Open link</a></label>
+                    <a class="btn btn-warning my-2" id="searchYTButton" data-value="{{ game_info['NAME'] }}" href="#" target="_blank">Search Youtube</a>
+                    
                     <div class="input-group mb-3">
                         <input type="text" class="form-control" id="youtube" value="{{ game_info['YOUTUBE'] }}">
                         <button class="btn bg-primary text-white" type="button" data-target="#youtube">Copy</button>
@@ -192,6 +230,12 @@
             integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
             crossorigin="anonymous"></script>
         <script>
+            function encodeQueryData(data) {
+                const ret = [];
+                for (let d in data)
+                    ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
+                return ret.join('&');
+            }
             buttons = document.getElementsByTagName("button")
             for (var i = 0; i < buttons.length; i++) {
                 buttons[i].addEventListener("click", async (evt) => {
@@ -210,6 +254,32 @@
 
                 })
             }
+            let openImagePathButton = document.querySelector("#folderPath")
+            if (openImagePathButton != null) {
+                openImagePathButton.addEventListener("click", (evt) => {
+                    let folderPath = evt.target.attributes.getNamedItem('data-value').value
+                    fetch("/openfolder", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            'folderPath': folderPath
+                        })
+                    })
+                    .then(resp => {
+                        console.log("Opening folder")
+                    })
+                })
+            }
+            let searchRentalButton = document.querySelector("#searchRentalButton")
+            let gameName = searchRentalButton.attributes.getNamedItem('data-value').value
+            const GOOGLE_SEARCH_URL = 'https://google.com/search?' + encodeQueryData({ 'q': gameName + ' NFT Rental' })
+            searchRentalButton.href = GOOGLE_SEARCH_URL
+
+            let searchYTButton = document.querySelector("#searchYTButton")
+            const YOUTUBE_SEARCH_URL = 'https://www.youtube.com/results?' + encodeQueryData({ 'search_query': gameName + ' trailer' })
+            searchYTButton.href = YOUTUBE_SEARCH_URL
 
         </script>
 </body>

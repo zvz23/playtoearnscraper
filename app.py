@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect, abort
+from flask import Flask, render_template, url_for, redirect, abort, request, jsonify
 import os
 import db
 
@@ -20,9 +20,15 @@ def transorm_game_info(game_info: dict):
     formatted_devices = ', '.join(game_info['DEVICES'].split(','))
     new_info['DEVICES'] = formatted_devices
     free_to_play = True
-    if game_info['FREE_TO_PLAY'] is None or game_info['FREE_TO_PLAY'] != 'Yes':
+    if game_info['FREE_TO_PLAY'] is None or game_info['FREE_TO_PLAY'].lower() != 'yes':
         free_to_play = False
     new_info['FREE_TO_PLAY'] = free_to_play
+    
+    nft_support = True
+    if game_info['NFT_SUPPORT'] is None or game_info['NFT_SUPPORT'].lower() != 'yes':
+        nft_support = False
+    new_info['NFT_SUPPORT'] = nft_support
+
     current_id = int(game_info['ID'])
     new_info['NEXT_ID'] = None
     new_info['PREV_ID'] = None
@@ -30,6 +36,12 @@ def transorm_game_info(game_info: dict):
         new_info['PREV_ID'] = current_id - 1
     if current_id < 1947:
         new_info['NEXT_ID'] = current_id + 1
+    new_info['IMAGES'] = []
+    new_info['IMAGES_PATH'] = None
+    images_path = os.path.join('static', 'images', str(game_info['ID']))
+    if os.path.exists(images_path):
+        new_info['IMAGES'] = [os.path.join('/',images_path, i).replace('\\', '/') for i in os.listdir(images_path)]
+        new_info['IMAGES_PATH'] = os.path.join(os.getcwd(), images_path)
 
     return new_info
 @app.route("/", methods=["GET"])
@@ -49,8 +61,19 @@ def game(game_id):
     if game_info is None:
         abort(404)
     transormed_info = transorm_game_info(game_info)
+    with open('last.txt', 'w') as f:
+        f.write(str(game_info['ID']))
     return render_template("index.html", transformed_info=transormed_info, game_info=game_info)
 
+@app.route("/openfolder", methods=["POST"])
+def open_path():
+    folder = request.json['folderPath']
+    command = f'explorer {folder}'
+    print(command)
+    os.system(f'explorer {folder}')
+    response = jsonify({ 'status_code': 200 })
+    response.status_code = 200
+    return response
 
 if __name__ == '__main__':
     app.run()
