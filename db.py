@@ -90,6 +90,12 @@ def get_nft_tokens(id: int):
         cursor.execute(f"SELECT NFT_TOKENS FROM {TABLE_NAME} WHERE ID=?", [id])
         return cursor.fetchone['NFT_TOKENS']
     
+def get_games_with_tokens_count():
+    with sqlite3.connect(DB_NAME) as conn:
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT COUNT(ID) FROM {TABLE_NAME} WHERE CRYPTO_TOKENS IS NOT NULL OR NFT_TOKENS IS NOT NULL")
+        return cursor.fetchone()[0]
+    
 def update_game_column(id: int, column: str, value: str):
     with sqlite3.connect(DB_NAME) as conn:
         cursor = conn.cursor()
